@@ -94,14 +94,22 @@ scene.add(directionalLight);
  */
 const sizes = {
   width: window.innerWidth,
-  height: window.innerHeight,
+  height: window.document.documentElement.clientHeight,
 };
+
+let initialHeight = window.innerHeight;
 
 window.addEventListener("resize", () => {
   if (!isScrolling) {
     // Update sizes
     sizes.width = window.innerWidth;
-    sizes.height = window.document.documentElement.clientHeight;
+
+    // Check if mobile device
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+      sizes.height = initialHeight;
+    } else {
+      sizes.height = window.document.documentElement.clientHeight;
+    }
 
     // Update camera
     camera.aspect = sizes.width / sizes.height;
