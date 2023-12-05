@@ -6,11 +6,13 @@
 
 .content {
     overflow-x: hidden;
+ 
 }
 
 html {
   background: #1e1a20;  
   overflow-x: hidden;
+
 }
 
 .webgl
@@ -21,10 +23,9 @@ html {
     outline: none;
 }
 
-
-
 .section
 {
+
     display: flex;
     align-items: center;
     height: 100vh;
@@ -60,4 +61,8 @@ section:nth-child(odd)
 
 span {
     color: red;
+}
+
+.section-three-container {
+    background: yellow;
 }

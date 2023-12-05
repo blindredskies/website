@@ -5,17 +5,18 @@ import gsap from "gsap";
 let isTabActive = true;
 let isAnimating = true;
 
-document.addEventListener("visibilitychange", function () {
-  if (document.hidden) {
-    console.log("hidden");
-    isTabActive = false;
-    isAnimating = false;
-  } else {
-    console.log("visible");
-    isTabActive = true;
-    isAnimating = true;
-    previousTime = clock.getElapsedTime();
-  }
+window.addEventListener("blur", function () {
+  console.log("hidden");
+  isTabActive = false;
+  isAnimating = false;
+});
+
+window.addEventListener("focus", function () {
+  console.log("visible");
+  isTabActive = true;
+  isAnimating = true;
+  previousTime = clock.getElapsedTime();
+  tick();
 });
 
 window.addEventListener("mousemove", (event) => {
@@ -28,6 +29,7 @@ window.addEventListener("mousemove", (event) => {
 //text sections
 const sectionOne = document.querySelector(".section-one");
 const sectionTwo = document.querySelector(".section-two");
+const sectionThree = document.querySelector(".section-three");
 
 const parameters = {
   materialColor: "#c2252f",
@@ -193,6 +195,11 @@ gsap.set(sectionTwo, {
   opacity: 0,
 });
 
+gsap.set(sectionThree, {
+  x: -window.innerWidth,
+  opacity: 0,
+});
+
 const clock = new THREE.Clock();
 let previousTime = 0;
 
@@ -206,7 +213,7 @@ window.addEventListener("scroll", () => {
 
   if (newSection !== currentSection) {
     // Stop any ongoing animations of the sections
-    gsap.killTweensOf([sectionOne, sectionTwo]);
+    gsap.killTweensOf([sectionOne, sectionTwo, sectionThree]);
 
     // Animate out the current section
     if (currentSection === 0) {
@@ -219,6 +226,13 @@ window.addEventListener("scroll", () => {
     } else if (currentSection === 1) {
       gsap.to(sectionTwo, {
         x: window.innerWidth,
+        opacity: 0,
+        duration: 1,
+        ease: "power1.inOut",
+      });
+    } else if (currentSection === 2) {
+      gsap.to(sectionThree, {
+        x: -window.innerWidth,
         opacity: 0,
         duration: 1,
         ease: "power1.inOut",
@@ -243,6 +257,12 @@ window.addEventListener("scroll", () => {
       gsap.fromTo(
         sectionTwo,
         { x: window.innerWidth, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1, ease: "power1.inOut" }
+      );
+    } else if (currentSection === 2) {
+      gsap.fromTo(
+        sectionThree,
+        { x: -window.innerWidth, opacity: 0 },
         { x: 0, opacity: 1, duration: 1, ease: "power1.inOut" }
       );
     }
@@ -289,10 +309,6 @@ window.addEventListener("resize", () => {
 });
 
 const tick = () => {
-  if (!isAnimating) {
-    console.log("not animating");
-    return;
-  }
   const elapsedTime = clock.getElapsedTime();
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
