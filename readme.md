@@ -1,1 +1,1 @@
-#Repo for blindredskies website
+Repo for blindredskies website
