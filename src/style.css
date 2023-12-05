@@ -6,6 +6,7 @@
 
 html {
   background: #1e1a20;  
+  overflow-x: hidden;
 }
 
 .webgl

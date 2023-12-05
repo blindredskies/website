@@ -1,4 +1,9 @@
 import * as THREE from "three";
+import gsap from "gsap";
+
+//text sections
+const sectionOne = document.querySelector(".section-one");
+const sectionTwo = document.querySelector(".section-two");
 
 const parameters = {
   materialColor: "#c2252f",
@@ -141,9 +146,6 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-//scroll
-let scrollY = window.scrollY;
-
 //cursor
 const cursor = {};
 cursor.x = 0;
@@ -157,6 +159,14 @@ window.addEventListener("mousemove", (event) => {
 /**
  * Animate
  */
+let currentSection = 0;
+
+// Set initial state of section-two
+gsap.set(sectionTwo, {
+  x: window.innerWidth,
+  opacity: 0,
+});
+
 const clock = new THREE.Clock();
 let previousTime = 0;
 
@@ -166,6 +176,52 @@ let currentScrollY = window.scrollY;
 window.addEventListener("scroll", () => {
   isScrolling = true;
   targetScrollY = window.scrollY;
+  const newSection = Math.round(targetScrollY / sizes.height);
+
+  if (newSection !== currentSection) {
+    // Stop any ongoing animations of the sections
+    gsap.killTweensOf([sectionOne, sectionTwo]);
+
+    // Animate out the current section
+    if (currentSection === 0) {
+      gsap.to(sectionOne, {
+        x: -window.innerWidth,
+        opacity: 0,
+        duration: 1,
+        ease: "power1.inOut",
+      });
+    } else if (currentSection === 1) {
+      gsap.to(sectionTwo, {
+        x: window.innerWidth,
+        opacity: 0,
+        duration: 1,
+        ease: "power1.inOut",
+      });
+    }
+
+    currentSection = newSection;
+    gsap.to(particles.rotation, {
+      duration: 1,
+      ease: "power1.inOut",
+      y: currentSection * Math.PI * 0.5,
+    });
+
+    // Animate in the new section
+    if (currentSection === 0) {
+      gsap.fromTo(
+        sectionOne,
+        { x: -window.innerWidth, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1, ease: "power1.inOut" }
+      );
+    } else if (currentSection === 1) {
+      gsap.fromTo(
+        sectionTwo,
+        { x: window.innerWidth, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1, ease: "power1.inOut" }
+      );
+    }
+  }
+
   clearTimeout(window.scrollFinished);
   window.scrollFinished = setTimeout(() => {
     isScrolling = false;
@@ -225,8 +281,8 @@ const tick = () => {
     (parallaxY - cameraGroup.position.y) * 2 * deltaTime;
 
   //animate meshes
-  sectionMeshes[0].rotation.x = elapsedTime * 0.07;
-  sectionMeshes[0].rotation.y = -elapsedTime * 0.1;
+  sectionMeshes[0].rotation.x += deltaTime * 0.07;
+  sectionMeshes[0].rotation.y += -deltaTime * 0.1;
 
   mesh1.position.x = lerp(mesh1.position.x, targetMeshPosition.x, 0.05);
   mesh1.position.y = lerp(mesh1.position.y, targetMeshPosition.y, 0.05);
