@@ -98,17 +98,21 @@ const sizes = {
 };
 
 window.addEventListener("resize", () => {
-  // Update sizes
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
+  if (!isScrolling) {
+    // Update sizes
+    sizes.width = window.innerWidth;
+    sizes.height = window.document.documentElement.clientHeight;
 
-  // Update camera
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
+    // Update camera
+    camera.aspect = sizes.width / sizes.height;
+    camera.updateProjectionMatrix();
 
-  // Update renderer
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    updateMeshPosition();
+  }
 });
 
 /**
@@ -196,6 +200,7 @@ window.addEventListener("scroll", () => {
     isScrolling = false;
   }, 100);
 });
+
 window.addEventListener("resize", () => {
   if (isScrolling) return;
   updateMeshPosition();
