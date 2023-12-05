@@ -159,12 +159,45 @@ window.addEventListener("mousemove", (event) => {
 const clock = new THREE.Clock();
 let previousTime = 0;
 
+let targetScrollY = window.scrollY;
+let currentScrollY = window.scrollY;
+
+window.addEventListener("scroll", () => {
+  targetScrollY = window.scrollY;
+});
+
+const lerp = (start, end, t) => {
+  return start * (1 - t) + end * t;
+};
+
+let targetMeshPosition = { x: mesh1.position.x, y: mesh1.position.y };
+
+function updateMeshPosition() {
+  if (window.matchMedia("(max-width: 768px)").matches) {
+    targetMeshPosition.x = 0;
+    targetMeshPosition.y = 0;
+  } else {
+    targetMeshPosition.x = 1;
+    targetMeshPosition.y = -objectDistance * 0;
+  }
+}
+
+// Call the function initially
+updateMeshPosition();
+
+// Update the mesh position on window resize
+window.addEventListener("resize", updateMeshPosition);
+
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
-  //animate camera
-  camera.position.y = (-scrollY / sizes.height) * objectDistance;
+
+  // Update currentScrollY towards targetScrollY
+  currentScrollY = lerp(currentScrollY, targetScrollY, 0.1);
+
+  // Use currentScrollY instead of scrollY for camera position
+  camera.position.y = (-currentScrollY / sizes.height) * objectDistance;
 
   const parallaxX = cursor.x * 0.8;
   const parallaxY = -cursor.y * 0.8;
@@ -176,6 +209,9 @@ const tick = () => {
   //animate meshes
   sectionMeshes[0].rotation.x = elapsedTime * 0.07;
   sectionMeshes[0].rotation.y = -elapsedTime * 0.1;
+
+  mesh1.position.x = lerp(mesh1.position.x, targetMeshPosition.x, 0.05);
+  mesh1.position.y = lerp(mesh1.position.y, targetMeshPosition.y, 0.05);
 
   // Render
   renderer.render(scene, camera);
