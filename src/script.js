@@ -1,6 +1,30 @@
 import * as THREE from "three";
 import gsap from "gsap";
 
+//event listeners to disable mouse tracking when tab is not active
+let isTabActive = true;
+let isAnimating = true;
+
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) {
+    console.log("hidden");
+    isTabActive = false;
+    isAnimating = false;
+  } else {
+    console.log("visible");
+    isTabActive = true;
+    isAnimating = true;
+    previousTime = clock.getElapsedTime();
+  }
+});
+
+window.addEventListener("mousemove", (event) => {
+  if (isTabActive) {
+    cursor.x = event.clientX / sizes.width - 0.5;
+    cursor.y = event.clientY / sizes.height - 0.5;
+  }
+});
+
 //text sections
 const sectionOne = document.querySelector(".section-one");
 const sectionTwo = document.querySelector(".section-two");
@@ -152,8 +176,10 @@ cursor.x = 0;
 cursor.y = 0;
 
 window.addEventListener("mousemove", (event) => {
-  cursor.x = event.clientX / sizes.width - 0.5;
-  cursor.y = event.clientY / sizes.height - 0.5;
+  if (isTabActive && event.target === document.body) {
+    cursor.x = event.clientX / sizes.width - 0.5;
+    cursor.y = event.clientY / sizes.height - 0.5;
+  }
 });
 
 /**
@@ -203,7 +229,7 @@ window.addEventListener("scroll", () => {
     gsap.to(particles.rotation, {
       duration: 1,
       ease: "power1.inOut",
-      y: currentSection * Math.PI * 0.5,
+      y: currentSection * Math.PI * 0.25,
     });
 
     // Animate in the new section
@@ -263,6 +289,10 @@ window.addEventListener("resize", () => {
 });
 
 const tick = () => {
+  if (!isAnimating) {
+    console.log("not animating");
+    return;
+  }
   const elapsedTime = clock.getElapsedTime();
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
