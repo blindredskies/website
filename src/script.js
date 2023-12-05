@@ -139,9 +139,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 //scroll
 let scrollY = window.scrollY;
-window.addEventListener("scroll", () => {
-  scrollY = window.scrollY;
-});
 
 //cursor
 const cursor = {};
@@ -163,7 +160,12 @@ let targetScrollY = window.scrollY;
 let currentScrollY = window.scrollY;
 
 window.addEventListener("scroll", () => {
+  isScrolling = true;
   targetScrollY = window.scrollY;
+  clearTimeout(window.scrollFinished);
+  window.scrollFinished = setTimeout(() => {
+    isScrolling = false;
+  }, 100);
 });
 
 const lerp = (start, end, t) => {
@@ -186,7 +188,18 @@ function updateMeshPosition() {
 updateMeshPosition();
 
 // Update the mesh position on window resize
-window.addEventListener("resize", updateMeshPosition);
+let isScrolling = false;
+window.addEventListener("scroll", () => {
+  isScrolling = true;
+  clearTimeout(window.scrollFinished);
+  window.scrollFinished = setTimeout(() => {
+    isScrolling = false;
+  }, 100);
+});
+window.addEventListener("resize", () => {
+  if (isScrolling) return;
+  updateMeshPosition();
+});
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
